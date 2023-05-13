@@ -1,26 +1,18 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import { Endpoints } from "../api/Endpoints";
+import { fetchCategories } from '../redux/reducers/categoriesSlice';
 
 export const Navbar = () => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-
-  const fetchData = () => {
-    axios
-      .get(Endpoints.CATEGORY_URL)
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => console.log(error));
-  };
+  const categories = useSelector((state) => state.categories.categories);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchData();
-  }, [localStorage.firstname]);
+    dispatch(fetchCategories());
+  }, [localStorage.firstname, dispatch]);
 
   return (
     <div className="navbar bg-base-100 shadow-xl">
@@ -46,6 +38,9 @@ export const Navbar = () => {
             tabIndex={0}
             className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
           >
+            <li>
+              <Link to={`/products`}>ALL</Link>
+            </li>
             {categories.map((category) => (
               <li key={category}>
                 <Link to={`/products/${category}`}>
@@ -53,6 +48,9 @@ export const Navbar = () => {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link to={`/favorite`}>FAVORITES</Link>
+            </li>
           </ul>
         </div>
         <Link to="/" className="btn btn-ghost normal-case text-xl">
@@ -99,7 +97,15 @@ export const Navbar = () => {
                 </a>
                 <ul className="p-2">
                   <li>
-                    <button className="btn btn-primary" onClick={()=>{ localStorage.removeItem('firstname'); navigate('/'); }}>SignOut</button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        localStorage.removeItem("firstname");
+                        navigate("/");
+                      }}
+                    >
+                      SignOut
+                    </button>
                   </li>
                 </ul>
               </li>
